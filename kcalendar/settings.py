@@ -17,6 +17,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# GOOGLE CREDS
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+AUTH_PROVIDER_X509_CERT_URL = os.getenv('AUTH_PROVIDER_X509_CERT_URL')
+AUTH_PROVIDER_URL = os.getenv('AUTH_PROVIDER_URL')
+TOKEN_URI = os.getenv('TOKEN_URI')
+PROJECT_ID = os.getenv('PROJECT_ID')
+AUTH_URI = os.getenv('AUTH_URI')
+
+# SCOPES
+READ_ONLY_CAL = os.getenv('READ_ONLY_CAL')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
