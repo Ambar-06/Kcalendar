@@ -9,34 +9,36 @@ from googleapiclient.errors import HttpError
 from common.boilerplate.helper.constants import Platform
 from kcalendar import settings
 from user.repositories.auth_repo import AuthRepository
+from user.repositories.user_repo import UserRepository
 
-SCOPES = [settings.READ_ONLY_CAL]
+SCOPES = [settings.READ_ONLY_CAL, settings.CAL]
 
 class GoogleClient:
   def __init__(self):
     self.auth_repo = AuthRepository()
-    self.user_repo = ...
+    self.user_repo = UserRepository()
   
-  def initialize_client(self, parent=True, user_id : str = None ):
+  def create_service(self, parent=True, user_id : str = None ):
     if parent:
-        return Credentials(token_uri=settings.TOKEN_URI, client_id=settings.GOOGLE_CLIENT_ID, client_secret=settings.GOOGLE_CLIENT_SECRET, scopes=SCOPES)
+        creds = Credentials(token_uri=settings.TOKEN_URI, client_id=settings.GOOGLE_CLIENT_ID, client_secret=settings.GOOGLE_CLIENT_SECRET, scopes=SCOPES)
     else:
       user_tokens = self.auth_repo.GetFirst([("invitee__uuid", user_id), ("platform", Platform().GOOGLE_MEET)], error=False)
       if not user_tokens:
         flow = InstalledAppFlow.from_client_secrets_file(
           "credentials.json", SCOPES
         )
-        creds = flow.run_local_server(port=0)
-        creds_dict = creds.to_json()
-
+        creds_info = flow.run_local_server(port=0)
+        creds_dict = creds_info.to_json()
+        user_ins = self.user_repo.GetFirst([("uuid", user_id)], error=False)
         values = {
-            "invitee": user_id,
+            "inviter": user_ins,
             "access_token": creds_dict.get("token"),
             "refresh_token": creds_dict.get("refresh_token"),
             "expires_at": creds_dict.get("expiry"),
             "platform": Platform().GOOGLE_MEET
         }
-      return Credentials(token=user_tokens.access_token, refresh_token=user_tokens.refresh_token, scopes=SCOPES)
+        creds = Credentials(token=user_tokens.access_token, refresh_token=user_tokens.refresh_token, scopes=SCOPES)
+    return build("calendar", "v3", credentials=creds)
 
 
 

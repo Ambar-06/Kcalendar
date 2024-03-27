@@ -28,6 +28,7 @@ AUTH_URI = os.getenv('AUTH_URI')
 
 # SCOPES
 READ_ONLY_CAL = os.getenv('READ_ONLY_CAL')
+CAL = os.getenv('CAL')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
