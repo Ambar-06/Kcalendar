@@ -1,6 +1,7 @@
 import typing as _
 
-from common.helpers.constants import StatusCodes
+from common.helper.constants import StatusCodes
+
 
 T = _.TypeVar("T")
 

@@ -32,3 +32,18 @@ class InviteType:
 
 obj_invite_type = InviteType()
 InviteTypeDictionary = obj_invite_type.__dict__
+
+@dataclass
+class StatusCodes:
+    def __init__(self):
+        self.SUCCESS = 200
+        self.CREATED = 201
+        self.NO_CONTENT = 204
+        self.BAD_REQUEST = 400
+        self.UNAUTHORIZED = 401
+        self.FORBIDDEN = 403
+        self.NOT_FOUND = 404
+        self.INTERNAL_SERVER_ERROR = 500
+
+obj_status_codes = StatusCodes()
+StatusCodesDictionary = obj_status_codes.__dict__

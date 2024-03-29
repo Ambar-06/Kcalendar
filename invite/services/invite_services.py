@@ -1,23 +1,21 @@
 from common.boilerplate.services.base_service import BaseService
+from invite.google.google_client import GoogleClient
 from invite.repositories.invitation_repo import InvitationRepository
 
 
 class InviteService(BaseService):
     def __init__(self):
         self.invitation_repo = InvitationRepository()
+        self.google_client = GoogleClient()
 
-    def post_service(self, request, data):        
+    def post_service(self, request, data):
         values = {
-            "user_id": request.user.id,
-            "title": data.get("meetingTitle"),
             "date" : data.get("meetingDate"),
-            "time": data.get("meetingTime"),
-            "description": data.get("meetingDescription"),
-            "start_time": data.get("start_time"),
-            "end_time": data.get("end_time"),
-            "platform": data.get("platform"),
-            "invite_type": data.get("invite_type"),
-            "invitees": data.get("meetingInvitees"),
-            "duration": data.get("meetingDuration"),
-        }
+            "time" : data.get("meetingTime"),
+            "inviter" : request.user,
+            "invitees_count" : len(data.get("meetingInvitees")),
+            "invitees_emails" : data.get("meetingInvitees"),
+        }    
+        invite = self.invitation_repo.Create(values)
+
         
