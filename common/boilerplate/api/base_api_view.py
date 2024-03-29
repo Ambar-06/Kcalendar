@@ -2,7 +2,8 @@ import typing as _
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from common.helpers.constants import StatusCodes
+from common.helper.constants import StatusCodes
+
 
 T = _.TypeVar("T")
 

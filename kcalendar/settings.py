@@ -30,6 +30,10 @@ AUTH_URI = os.getenv('AUTH_URI')
 READ_ONLY_CAL = os.getenv('READ_ONLY_CAL')
 CAL = os.getenv('CAL')
 
+# JWT
+JWT_SECRET = os.getenv('JWT_SECRET')
+JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 

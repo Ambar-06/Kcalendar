@@ -2,7 +2,8 @@ import typing as _
 from rest_framework import serializers
 from rest_framework.request import Request
 from rest_framework.response import Response
-from common.helpers.constants import StatusCodes
+
+from common.helper.constants import StatusCodes
 
 """
 This class is used for validating the request

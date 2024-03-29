@@ -1,8 +1,8 @@
 import typing as _
 from rest_framework.response import Response
 from jose import jwt
-from common.helpers.constants import UserStatus
 from common.boilerplate.auth.jwt_service import JWTService
+from common.helper.constants import StatusCodes
 from user.models.user import User
 from user.repositories.user_repo import UserRepository
 
@@ -33,24 +33,24 @@ WorkFlow:
 NOT_VALID_TOKEN = Response(
     {
         "success": False,
-        "code": 401,
+        "code": StatusCodes().UNAUTHORIZED,
         "message": "Please provide a valid authorization header",
     },
-    status=401,
+    status=StatusCodes().UNAUTHORIZED,
 )
 
 NOT_VALID_ROLE = Response(
-    {"success": False, "code": 401, "message": "You don't have access permission"},
-    status=401,
+    {"success": False, "code": StatusCodes().UNAUTHORIZED, "message": "You don't have access permission"},
+    status=StatusCodes().UNAUTHORIZED,
 )
 
 NOT_ACTIVE_USER = Response(
-    {"success": False, "code": 401, "message": "User is an inactive user"}, status=401
+    {"success": False, "code": StatusCodes().UNAUTHORIZED, "message": "User is an inactive user"}, status=StatusCodes().UNAUTHORIZED
 )
 
 HEADER_NOT_FOUND = Response(
-    {"success": False, "code": 401, "message": "Authorization header not present"},
-    status=401,
+    {"success": False, "code": StatusCodes().UNAUTHORIZED, "message": "Authorization header not present"},
+    status=StatusCodes().UNAUTHORIZED,
 )
 
 EXPIRED_TOKEN = Response(
@@ -58,7 +58,7 @@ EXPIRED_TOKEN = Response(
 )
 
 WRONG_SIGNATURE = Response(
-    {"success": False, "code": 401, "message": "Invalid signature"}, status=401
+    {"success": False, "code": StatusCodes().UNAUTHORIZED, "message": "Invalid signature"}, status=StatusCodes().UNAUTHORIZED
 )
 
 
@@ -97,8 +97,6 @@ def auth_guard(roles=None):
                 return NOT_VALID_ROLE
             if user.is_deleted:
                 return NOT_VALID_TOKEN
-            if user.status == UserStatus().INACTIVE:
-                return NOT_ACTIVE_USER
             req.user = user.__dict__
             return fun(*args, user, payload, **kwargs)
 

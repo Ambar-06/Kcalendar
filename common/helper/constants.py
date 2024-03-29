@@ -43,6 +43,7 @@ class StatusCodes:
         self.UNAUTHORIZED = 401
         self.FORBIDDEN = 403
         self.NOT_FOUND = 404
+        self.UNPROCESSABLE_ENTITY = 422
         self.INTERNAL_SERVER_ERROR = 500
 
 obj_status_codes = StatusCodes()
