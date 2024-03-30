@@ -1,0 +1,1 @@
+from .register_views import RegisterViews

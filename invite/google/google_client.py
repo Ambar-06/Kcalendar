@@ -29,11 +29,18 @@ class GoogleClient:
         self.auth_repo = AuthRepository()
         self.user_repo = UserRepository()
   
-    def create_service(self, parent=False, user_id : str = None ):
-        if parent:
+    def create_service(self, user_id : str = None ):
+        if not user_id:
             creds = Credentials(token_uri=settings.TOKEN_URI, client_id=settings.GOOGLE_CLIENT_ID, client_secret=settings.GOOGLE_CLIENT_SECRET, scopes=SCOPES)
         else:
             user_ins = self.user_repo.GetFirst([("uuid", user_id)], error=False)
+            user_token_ins = self.auth_repo.GetFirst([("inviter__uuid", user_id), ("platform", Platform().GOOGLE_MEET)])
+            if user_token_ins:
+                creds = Credentials(token=user_token_ins.access_token, refresh_token=user_token_ins.refresh_token, scopes=SCOPES)
+                if creds.expired:
+                    creds.refresh(Request())
+                else:
+                    return build("calendar", "v3", credentials=creds)
             config = {
                 "installed": {
                     "client_id": settings.GOOGLE_CLIENT_ID,
@@ -67,7 +74,7 @@ class GoogleClient:
         print('Event created: %s' % (event.get('htmlLink')))
         return event.get('htmlLink')
 
-    def initialize_event(self, intendees_list : list, start_time : str, end_time : str, description : str, location : str, summary : str, timezone : str):
+    def initialize_event(self, invitees_list : list, start_time : str, end_time : str, description : str, location : str, summary : str, timezone : str):
         return {
           'summary': summary,
           'location': location,
@@ -84,7 +91,7 @@ class GoogleClient:
             'RRULE:FREQ=DAILY;COUNT=2'
           ],
           'attendees': [
-            {'email': email } for email in intendees_list
+            {'email': email } for email in invitees_list
           ],
           'reminders': {
             'useDefault': False,
