@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 
 from common.boilerplate.models.base_model import BaseModel
@@ -8,7 +9,8 @@ class User(BaseModel):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255, null=True, blank=True)
     password = models.CharField(max_length=255)
-    token = models.CharField(max_length=255, null=True, blank=True)
+    token = models.UUIDField(default=uuid.uuid4, null=True, blank=True)
+    token_expiry = models.DateTimeField(null=True, blank=True)
 
 class AuthTokens(BaseModel):
     inviter = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="user_auth_tokens", null=True)
