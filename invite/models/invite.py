@@ -10,5 +10,4 @@ class Invite(BaseModel):
     end_time = models.TimeField()
     platform = models.IntegerField(null=True, blank=True)
     duration_in_minutes = models.IntegerField(null=True, blank=True)
-    is_deleted = models.BooleanField(default=False, null=True, blank=True)
 

@@ -33,6 +33,10 @@ CAL = os.getenv('CAL')
 # JWT
 JWT_SECRET = os.getenv('JWT_SECRET')
 JWT_ALGORITHM = os.getenv('JWT_ALGORITHM')
+JWT_EXPIRATION_IN_DAYS = os.getenv('JWT_EXPIRATION_IN_DAYS')
+
+# USER TOKEN
+USER_TOKEN_EXPIRY = os.getenv('USER_TOKEN_EXPIRY')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
