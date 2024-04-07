@@ -94,7 +94,7 @@ class DateTime:
         datetime_obj,
         time_zone: _.Optional[str] = "UTC",
         operation: _.Optional[str] = "+",
-        delta: _.Optional[dict] = {"seconds": 0, "minutes": 30, "hours": 0, "days": 0},
+        delta: _.Optional[dict] = {"seconds": 0, "minutes": 0, "hours": 0, "days": 0},
     ):
         if time_zone == "UTC":
             datetime_obj = datetime_obj.replace(tzinfo=dt.timezone.utc)
