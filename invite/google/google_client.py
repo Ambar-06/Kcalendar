@@ -34,7 +34,7 @@ class GoogleClient:
             creds = Credentials(token_uri=settings.TOKEN_URI, client_id=settings.GOOGLE_CLIENT_ID, client_secret=settings.GOOGLE_CLIENT_SECRET, scopes=SCOPES)
         else:
             user_ins = self.user_repo.GetFirst([("uuid", user_id)], error=False)
-            user_token_ins = self.auth_repo.GetFirst([("inviter__uuid", user_id), ("platform", Platform().GOOGLE_MEET)])
+            user_token_ins = self.auth_repo.GetFirst([("inviter__uuid", user_id), ("platform", Platform().GOOGLE_MEET)], error=False)
             if user_token_ins:
                 creds = Credentials(token=user_token_ins.access_token, refresh_token=user_token_ins.refresh_token, scopes=SCOPES)
                 if creds.expired:
@@ -49,13 +49,13 @@ class GoogleClient:
                     "token_uri": settings.TOKEN_URI,
                     "auth_provider_x509_cert_url": settings.AUTH_PROVIDER_X509_CERT_URL,
                     "client_secret": settings.GOOGLE_CLIENT_SECRET,
-                    "redirect_uris": ["urn:ietf:wg:oauth:2.0:oob", "http://localhost"],
+                    "redirect_uris": ["http://127.0.0.1", "http://localhost"],
                 }
             }
             flow = InstalledAppFlow.from_client_config(
             config, SCOPES 
             )
-            creds_info = flow.run_local_server(port=0)
+            creds_info = flow.run_local_server(port=8001)
             creds_dict = creds_info.to_json()
             values = {
                 "inviter": user_ins,
