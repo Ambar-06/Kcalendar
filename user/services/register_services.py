@@ -1,4 +1,5 @@
 import datetime
+from common.boilerplate.auth.password_handler import PasswordHandler
 from common.boilerplate.input_output_operations.datetime import DateTime
 from common.boilerplate.services.base_service import BaseService
 from common.helper.constants import StatusCodes
@@ -11,6 +12,7 @@ class RegisterService(BaseService):
         self.date_util = DateTime()
         self.user_repo = UserRepository()
         self.register_validator = RegistrationValidator()
+        self.pw_handler = PasswordHandler()
 
     def post_service(self, request, data):
         today = datetime.datetime.now()
@@ -20,7 +22,7 @@ class RegisterService(BaseService):
             'email': data.get("email"),
             'first_name': data.get("firstName"),
             'last_name': data.get("lastName"),
-            'password': data.get("password"),
+            'password': self.pw_handler.hash_pw(data.get("password")),
             "token_expiry": self.date_util.change_time(today, operation="+", delta={"days": int(settings.USER_TOKEN_EXPIRY)}, time_zone="Asia"),
         }
         user_data = self.user_repo.Create(values)
