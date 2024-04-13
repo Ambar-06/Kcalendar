@@ -1,15 +1,13 @@
 from rest_framework import serializers
 
+from common.boilerplate.input_output_operations.datetime import DateTimeFormatter
 from common.helper.constants import PlatformDictionary
 
 class InvitationFilterSerializer(serializers.Serializer):
-    meetingTime = serializers.TimeField(required=True, allow_null=False, error_messages={
+    meetingDateTime = serializers.DateTimeField(required=True, allow_null=False,
+        input_formats=[DateTimeFormatter().DATE_TIME_FORMAT_2], error_messages={
         'required': 'Meeting time is required',
         'null': 'Meeting time cannot be null'
-    })
-    meetingDate = serializers.DateField(required=True, allow_null=False, error_messages={
-        'required': 'Meeting date is required',
-        'null': 'Meeting date cannot be null'
     })
     meetingInvitees = serializers.ListField(child=serializers.EmailField(), required=True, allow_empty=False, error_messages={
         'required': 'Invitees are required',

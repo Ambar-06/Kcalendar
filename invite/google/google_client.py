@@ -1,5 +1,7 @@
-import datetime
+import datetime as dt
+import json
 import os.path
+from dateutil import parser
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -57,6 +59,7 @@ class GoogleClient:
             )
             creds_info = flow.run_local_server(port=8001)
             creds_dict = creds_info.to_json()
+            creds_dict = json.loads(creds_dict)
             values = {
                 "inviter": user_ins,
                 "access_token": creds_dict.get("token"),
@@ -74,17 +77,22 @@ class GoogleClient:
         print('Event created: %s' % (event.get('htmlLink')))
         return event.get('htmlLink')
 
-    def initialize_event(self, invitees_list : list, start_time : str, end_time : str, description : str, location : str, summary : str, timezone : str):
+    def initialize_event(self, invitees_list : list, start_date_time : str, description : str, location : str, summary : str, timezone : str):
+        start_date_time_obj = parser.parse(start_date_time) if isinstance(start_date_time, str) else start_date_time
+        end_date_time_obj = start_date_time_obj + dt.timedelta(minutes=30)
+        start_time_tz = str(start_date_time_obj).split("+")[0].replace(" ", "T") + "Z"
+        end_time_tz = str(end_date_time_obj).split("+")[0].replace(" ", "T") + "Z"
+
         return {
           'summary': summary,
           'location': location,
           'description': description,
           'start': {
-            'dateTime': start_time,
+            'dateTime': start_time_tz,
             'timeZone': timezone,
           },
           'end': {
-            'dateTime': end_time,
+            'dateTime': end_time_tz,
             'timeZone': timezone,
           },
           'recurrence': [
@@ -103,7 +111,7 @@ class GoogleClient:
         }
     
     def get_events(self, service):
-        now = datetime.datetime.utcnow().isoformat() + "Z"
+        now = dt.datetime.utcnow().isoformat() + "Z"
         print("Getting the upcoming 10 events")
         events_result = (
             service.events()

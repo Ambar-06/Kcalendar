@@ -15,7 +15,7 @@ class User(BaseModel):
 class AuthTokens(BaseModel):
     inviter = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="user_auth_tokens", null=True)
     access_token = models.CharField(max_length=255)
-    refresh_token = models.CharField(max_length=255)
+    refresh_token = models.CharField(max_length=255, null=True, blank=True)
     expires_at = models.DateTimeField()
     platform = models.IntegerField()
     

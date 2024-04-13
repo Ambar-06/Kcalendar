@@ -14,15 +14,14 @@ class InviteService(BaseService):
     def post_service(self, request, data):
         user_ins = self.user_repo.GetFirst([("uuid", request.user.get("uuid"))], error=False)
         values = {
-            "date" : data.get("meetingDate"),
-            "time" : data.get("meetingTime"),
+            "invitation_date_time" : data.get("meetingDateTime"),
             "inviter" : user_ins,
             "invitees_count" : len(data.get("meetingInvitees")),
             "invitees_emails" : data.get("meetingInvitees"),
         }    
         invitation = self.invitation_repo.Create(values)
         service = self.google_client.create_service(user_id=request.user.get("uuid"))
-        invite = self.google_client.initialize_event(invitees_list=invitation.invitees_emails, start_time=invitation.time, end_time=invitation.time, description="Meeting", location="Online", summary="Meeting", timezone="Asia/Kolkata")
+        invite = self.google_client.initialize_event(invitees_list=invitation.invitees_emails, start_date_time=invitation.invitation_date_time, description="Meeting", location="Online", summary="Meeting", timezone="GMT+05:30")
         self.google_client.create_event(service, invite)
         return self.ok(invitation, StatusCodes().SUCCESS)
 
