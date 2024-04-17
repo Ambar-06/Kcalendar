@@ -16,3 +16,4 @@ class Invitation(BaseModel):
     invitees_count = models.IntegerField(default=0, null=True, blank=True)
     invitees_emails = models.JSONField(null=True, blank=True)
     invitation_link = models.TextField(null=True, blank=True)
+    invitation_unique_id = models.CharField(max_length=255, null=True, blank=True)

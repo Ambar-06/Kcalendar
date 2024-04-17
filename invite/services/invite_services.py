@@ -1,14 +1,15 @@
 from common.boilerplate.services.base_service import BaseService
-from common.helper.constants import StatusCodes
+from common.helper.constants import Platform, StatusCodes
 from invite.google.google_client import GoogleClient
 from invite.repositories.invitation_repo import InvitationRepository
+from invite.utils.invitation_utils import InvitationUtil
 from user.repositories.user_repo import UserRepository
 
 
 class InviteService(BaseService):
     def __init__(self):
         self.invitation_repo = InvitationRepository()
-        self.google_client = GoogleClient()
+        self.invitation_util = InvitationUtil()
         self.user_repo = UserRepository()
 
     def post_service(self, request, data):
@@ -20,9 +21,10 @@ class InviteService(BaseService):
             "invitees_emails" : data.get("meetingInvitees"),
         }    
         invitation = self.invitation_repo.Create(values)
-        service = self.google_client.create_service(user_id=request.user.get("uuid"))
-        invite = self.google_client.initialize_event(invitees_list=invitation.invitees_emails, start_date_time=invitation.invitation_date_time, description="Meeting", location="Online", summary="Meeting", timezone="GMT+05:30")
-        self.google_client.create_event(service, invite)
+        if int(data.get("meetingPlatform")) == Platform().GOOGLE_MEET:
+            self.invitation_util.send_google_meet_invite(request, invitation, data.get("meetingInvitees"), data.get("meetingDateTime"), "Meeting", "Online", "Meeting", "GMT+05:30")
+        elif int(data.get("meetingPlatform")) == Platform().ZOOM:
+            pass
         return self.ok(invitation, StatusCodes().SUCCESS)
 
         

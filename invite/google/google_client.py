@@ -72,10 +72,12 @@ class GoogleClient:
         return build("calendar", "v3", credentials=creds)
 
 
-    def create_event(self, service, event):  
+    def create_event(self, service, event, invitation):  
         event = service.events().insert(calendarId='primary', body=event).execute()
-        print('Event created: %s' % (event.get('htmlLink')))
-        return event.get('htmlLink')
+        link = event.get('htmlLink')
+        invitation.invitation_link = link
+        invitation.save()
+        return link
 
     def initialize_event(self, invitees_list : list, start_date_time : str, description : str, location : str, summary : str, timezone : str):
         start_date_time_obj = parser.parse(start_date_time) if isinstance(start_date_time, str) else start_date_time
