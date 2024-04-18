@@ -29,3 +29,6 @@ class InvitationFilterSerializer(serializers.Serializer):
         'required': 'Meeting duration is required',
         'null': 'Meeting duration cannot be null'
     })
+    isPassRequired = serializers.BooleanField(required=False, default=False, error_messages={
+        'required': 'Pass code requirement is required'
+    })

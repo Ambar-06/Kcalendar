@@ -1,13 +1,11 @@
 import datetime as dt
 import json
-import os.path
 from dateutil import parser
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from googleapiclient.errors import HttpError
 from common.helper.constants import Platform
 from kcalendar import settings
 from user.repositories.auth_repo import AuthRepository
@@ -41,8 +39,8 @@ class GoogleClient:
                 creds = Credentials(token=user_token_ins.access_token, refresh_token=user_token_ins.refresh_token, scopes=SCOPES)
                 if creds.expired:
                     creds.refresh(Request())
-                else:
-                    return build("calendar", "v3", credentials=creds)
+                # else:
+                #     return build("calendar", "v3", credentials=creds)
             config = {
                 "installed": {
                     "client_id": settings.GOOGLE_CLIENT_ID,

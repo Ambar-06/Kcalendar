@@ -11,4 +11,4 @@ class RegistrationValidator:
         user_by_username = self.user_repository.GetFirst([("username", data.get("userName"))], error=False)
         user_by_email = self.user_repository.GetFirst([("email", data.get("email"))], error=False)
         if user_by_username or user_by_email:
-            raise exceptions.APIException("User Name or Email already exists", StatusCodes().BAD_REQUEST)
+            raise exceptions.APIException("User Name or Email already exists", code=StatusCodes().BAD_REQUEST)
