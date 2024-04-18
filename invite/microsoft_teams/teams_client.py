@@ -20,13 +20,13 @@ class TeamsClient:
         pass
 
     def setup_client(self):
-        graph_client = GraphServiceClient(credential, scopes)
-        request_body = online_meetings_request_builder(
-            start_date_time = "2019-07-12T14:30:34.2444915-07:00",
-            end_date_time = "2019-07-12T15:00:34.2464912-07:00",
-            subject = "User Token Meeting",
-        )
-        result = graph_client.me.calendar.get()
+        return GraphServiceClient(credential, scopes)
+        # request_body = online_meetings_request_builder(
+        #     start_date_time = "2019-07-12T14:30:34.2444915-07:00",
+        #     end_date_time = "2019-07-12T15:00:34.2464912-07:00",
+        #     subject = "User Token Meeting",
+        # )
+        # result = graph_client.me.calendar.get()
 
     def initialize_event(self, subject, content, start_date_time, end_date_time, time_zone, location, attendees_list):
         return {
