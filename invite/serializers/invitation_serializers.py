@@ -2,6 +2,7 @@ from rest_framework import serializers
 
 from common.boilerplate.input_output_operations.datetime import DateTimeFormatter
 from common.helper.constants import PlatformDictionary
+from invite.models.invitation import Invitation
 
 class InvitationFilterSerializer(serializers.Serializer):
     meetingDateTime = serializers.DateTimeField(required=True, allow_null=False,
@@ -32,3 +33,17 @@ class InvitationFilterSerializer(serializers.Serializer):
     isPassRequired = serializers.BooleanField(required=False, default=False, error_messages={
         'required': 'Pass code requirement is required'
     })
+
+class InviteViewSerializer(serializers.ModelSerializer):
+    invitationId = serializers.UUIDField(source='uuid', read_only=True)
+    invitationDateTime = serializers.DateTimeField(source='invitation_date_time', read_only=True)
+    invitationLink = serializers.URLField(source='invitation_link', read_only=True)
+    invitationUniqueId = serializers.CharField(source='invitation_unique_id', read_only=True)
+    class Meta:
+        model = Invitation
+        fields = [
+            'invitationId',
+            'invitationDateTime',
+            'invitationLink',
+            'invitationUniqueId'
+        ]

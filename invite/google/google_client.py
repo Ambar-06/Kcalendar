@@ -39,8 +39,8 @@ class GoogleClient:
                 creds = Credentials(token=user_token_ins.access_token, refresh_token=user_token_ins.refresh_token, scopes=SCOPES)
                 if creds.expired:
                     creds.refresh(Request())
-                # else:
-                #     return build("calendar", "v3", credentials=creds)
+                else:
+                    return build("calendar", "v3", credentials=creds)
             config = {
                 "installed": {
                     "client_id": settings.GOOGLE_CLIENT_ID,
