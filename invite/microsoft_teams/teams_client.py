@@ -71,8 +71,5 @@ class TeamsClient:
         # url = BASE_URL + "v1.0/me/calendar"
         url = BASE_URL + "v1.0/me/events"
         headers = {"Content-Type": "application/json"}
-        print(event)
         response = requests.post(url, data=event, headers=headers)
-        print(response)
-        print(response.text)
         return response
