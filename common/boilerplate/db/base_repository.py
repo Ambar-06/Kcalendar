@@ -1,6 +1,6 @@
 from typing import List
 from rest_framework import exceptions
-from django.db.models import Q
+from django.db.models import Q, Max
 
 """
 This class is used for base repository
@@ -109,11 +109,17 @@ class BaseRepository:
 
         return query
 
-    def Search(self, keyword, values=[], order_filter: str = None):
+    def Search(self, keyword, fields=[], order_filter: str = None, first: bool = False):
         q_objects = Q()
-        for value in values:
-            q_objects |= Q(**{value: keyword})
-        self.query = self.model.objects.filter(q_objects)
+        for field in fields:
+            q_objects |= Q(**{field: keyword})
         if order_filter:
-            return self.query.order_by(order_filter)
+            self.query = self.model.objects.filter(q_objects).order_by(order_filter)
+        self.query = self.model.objects.filter(q_objects)
+        if first:
+            return self.query.first()
         return self.query
+
+    
+    def GetMax(self, field):
+        return self.model.objects.aggregate(Max(field))

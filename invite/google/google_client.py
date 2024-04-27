@@ -1,17 +1,22 @@
 import datetime as dt
 import json
+import os
+from requests_oauthlib import OAuth2Session
+from oauthlib.oauth2 import WebApplicationClient
 from dateutil import parser
-
+from google.apps import meet_v2 as meet
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from common.helper.constants import Platform
+from common.helper.unique_id_generator import RandomIDNumberGenerator
 from kcalendar import settings
 from user.repositories.auth_repo import AuthRepository
 from user.repositories.user_repo import UserRepository
+from google.auth.exceptions import RefreshError
 
-SCOPES = [settings.READ_ONLY_CAL, settings.CAL]
+SCOPES = [settings.READ_ONLY_CAL, settings.CAL, settings.MEETING_SPACE]
 CREDS = {
     "installed": {
         "client_id": settings.GOOGLE_CLIENT_ID,
@@ -29,7 +34,7 @@ class GoogleClient:
         self.auth_repo = AuthRepository()
         self.user_repo = UserRepository()
   
-    def create_service(self, user_id : str = None ):
+    def create_service(self, user_id : str = None, return_creds : bool = False):
         if not user_id:
             creds = Credentials(token_uri=settings.TOKEN_URI, client_id=settings.GOOGLE_CLIENT_ID, client_secret=settings.GOOGLE_CLIENT_SECRET, scopes=SCOPES)
         else:
@@ -53,7 +58,7 @@ class GoogleClient:
                 }
             }
             flow = InstalledAppFlow.from_client_config(
-            config, SCOPES 
+            config, SCOPES
             )
             creds_info = flow.run_local_server(port=8001)
             creds_dict = creds_info.to_json()
@@ -67,39 +72,47 @@ class GoogleClient:
             }
             user_tokens = self.auth_repo.CreateOrUpdate([("inviter__uuid", user_id), ("platform", Platform().GOOGLE_MEET)], values)
             creds = Credentials(token=user_tokens.access_token, refresh_token=user_tokens.refresh_token, scopes=SCOPES)
+            if return_creds:
+                return creds
         return build("calendar", "v3", credentials=creds)
 
 
-    def create_event(self, service, event, invitation):  
-        event = service.events().insert(calendarId='primary', body=event).execute()
+    def create_event(self, service, event, invitation): 
+        try: 
+            event = service.events().insert(calendarId='primary', body=event).execute()
+        except RefreshError:
+            creds = self.create_service(user_id=invitation.inviter.uuid, return_creds=True)
+            service = build("calendar", "v3", credentials=creds)
+            event = service.events().insert(calendarId='primary', body=event).execute()
         link = event.get('htmlLink')
         invitation.invitation_link = link
         invitation.save()
         return link
 
-    def initialize_event(self, invitees_list : list, start_date_time : str, description : str, location : str, summary : str, timezone : str):
-        start_date_time_obj = parser.parse(start_date_time) if isinstance(start_date_time, str) else start_date_time
+    def initialize_event(self, **kwargs):
+        
+        start_date_time_obj = parser.parse(kwargs.get("start_date_time")) if isinstance(kwargs.get("start_date_time"), str) else kwargs.get("start_date_time")
         end_date_time_obj = start_date_time_obj + dt.timedelta(minutes=30)
         start_time_tz = str(start_date_time_obj).split("+")[0].replace(" ", "T") + "Z"
         end_time_tz = str(end_date_time_obj).split("+")[0].replace(" ", "T") + "Z"
 
         return {
-          'summary': summary,
-          'location': location,
-          'description': description,
+          'summary': kwargs.get("summary"),
+          'location': kwargs.get("location"),
+          'description': kwargs.get("description"),
           'start': {
             'dateTime': start_time_tz,
-            'timeZone': timezone,
+            'timeZone': kwargs.get("timezone"),
           },
           'end': {
             'dateTime': end_time_tz,
-            'timeZone': timezone,
+            'timeZone': kwargs.get("timezone"),
           },
           'recurrence': [
             'RRULE:FREQ=DAILY;COUNT=2'
           ],
           'attendees': [
-            {'email': email } for email in invitees_list
+            {'email': email } for email in kwargs.get("invitees_list")
           ],
           'reminders': {
             'useDefault': False,
@@ -108,6 +121,11 @@ class GoogleClient:
               {'method': 'popup', 'minutes': 10},
             ],
           },
+          'conferenceData': {
+            'createRequest': {
+                'requestId': RandomIDNumberGenerator().generate_random_id_number(use_alphanumeric=True),
+            },
+            },
         }
     
     def get_events(self, service):
@@ -134,3 +152,16 @@ class GoogleClient:
             start = event["start"].get("dateTime", event["start"].get("date"))
             events_dict.get("events").append({start : event["summary"]})
         return events_dict
+
+
+    async def create_space(self, creds):
+        client = meet.SpacesServiceAsyncClient(credentials=creds)
+
+        request = meet.CreateSpaceRequest()
+        response = await client.create_space(request=request)
+        
+    def create_oauth_uri(self):
+        oauth = OAuth2Session(settings.GOOGLE_CLIENT_ID, scope=SCOPES, redirect_uri=["http://127.0.0.1", "http://localhost"])
+        authorization_base_url = 'https://accounts.google.com/o/oauth2/auth'
+        authorization_url, state = oauth.authorization_url(authorization_base_url, access_type='offline')
+        return authorization_url, state

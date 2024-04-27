@@ -29,6 +29,7 @@ AUTH_URI = os.getenv('AUTH_URI')
 # SCOPES
 READ_ONLY_CAL = os.getenv('READ_ONLY_CAL')
 CAL = os.getenv('CAL')
+MEETING_SPACE = os.getenv('MEETING_SPACE')
 
 # JWT
 JWT_SECRET = os.getenv('JWT_SECRET')

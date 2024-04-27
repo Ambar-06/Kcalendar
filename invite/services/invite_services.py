@@ -22,7 +22,7 @@ class InviteService(BaseService):
         }    
         invitation = self.invitation_repo.Create(values)
         if int(data.get("platform")) == Platform().GOOGLE_MEET:
-            self.invitation_util.send_google_meet_invite(request, invitation, data.get("meetingInvitees"), data.get("meetingDateTime"), "Meeting", "Online", "Meeting", "GMT+05:30")
+            self.invitation_util.send_google_meet_invite(request, invitation=invitation,invitees_list=data.get("meetingInvitees"), start_date_time=data.get("meetingDateTime"), description="Meeting", location="Online", summary="Meeting", timezone="GMT+05:30")
         elif int(data.get("platform")) == Platform().ZOOM:
             pass
         elif int(data.get("platform")) == Platform().MICROSOFT_TEAMS:
