@@ -1,8 +1,6 @@
 import datetime as dt
 import json
-import os
 from requests_oauthlib import OAuth2Session
-from oauthlib.oauth2 import WebApplicationClient
 from dateutil import parser
 from google.apps import meet_v2 as meet
 from google.auth.transport.requests import Request
@@ -33,19 +31,20 @@ class GoogleClient:
     def __init__(self):
         self.auth_repo = AuthRepository()
         self.user_repo = UserRepository()
-  
-    def create_service(self, user_id : str = None, return_creds : bool = False):
+
+    def create_service(self, user_id : str = None, return_creds : bool = False, reauth : bool = False):
         if not user_id:
             creds = Credentials(token_uri=settings.TOKEN_URI, client_id=settings.GOOGLE_CLIENT_ID, client_secret=settings.GOOGLE_CLIENT_SECRET, scopes=SCOPES)
         else:
             user_ins = self.user_repo.GetFirst([("uuid", user_id)], error=False)
-            user_token_ins = self.auth_repo.GetFirst([("inviter__uuid", user_id), ("platform", Platform().GOOGLE_MEET)], error=False)
-            if user_token_ins:
-                creds = Credentials(token=user_token_ins.access_token, refresh_token=user_token_ins.refresh_token, scopes=SCOPES)
-                if creds.expired:
-                    creds.refresh(Request())
-                else:
-                    return build("calendar", "v3", credentials=creds)
+            if not reauth:
+                user_token_ins = self.auth_repo.GetFirst([("inviter__uuid", user_id), ("platform", Platform().GOOGLE_MEET)], error=False)
+                if user_token_ins:
+                    creds = Credentials(token=user_token_ins.access_token, refresh_token=user_token_ins.refresh_token, scopes=SCOPES)
+                    if creds.expired:
+                        creds.refresh(Request())
+                    else:
+                        return build("calendar", "v3", credentials=creds)
             config = {
                 "installed": {
                     "client_id": settings.GOOGLE_CLIENT_ID,
@@ -81,7 +80,7 @@ class GoogleClient:
         try: 
             event = service.events().insert(calendarId='primary', body=event).execute()
         except RefreshError:
-            creds = self.create_service(user_id=invitation.inviter.uuid, return_creds=True)
+            creds = self.create_service(user_id=invitation.inviter.uuid, return_creds=True, reauth=True)
             service = build("calendar", "v3", credentials=creds)
             event = service.events().insert(calendarId='primary', body=event).execute()
         link = event.get('htmlLink')
