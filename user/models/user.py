@@ -1,6 +1,5 @@
 import uuid
 from django.db import models
-
 from common.boilerplate.models.base_model import BaseModel
 
 class User(BaseModel):
