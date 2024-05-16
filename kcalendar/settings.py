@@ -26,6 +26,9 @@ TOKEN_URI = os.getenv('TOKEN_URI')
 PROJECT_ID = os.getenv('PROJECT_ID')
 AUTH_URI = os.getenv('AUTH_URI')
 
+# SECRETS
+UNIQUE_STR= os.getenv('UNIQUE_STR')
+
 # SCOPES
 READ_ONLY_CAL = os.getenv('READ_ONLY_CAL')
 CAL = os.getenv('CAL')

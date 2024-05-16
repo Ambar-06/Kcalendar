@@ -1,7 +1,6 @@
 import datetime as dt
 import random as _r
-
-STRING_APLHA = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+from kcalendar import settings
 
 class RandomIDNumberGenerator:
     def __init__(self):
@@ -15,7 +14,7 @@ class RandomIDNumberGenerator:
         elif optional_number > 99:
             optional_number = str(optional_number)[:2]
         if use_alphanumeric:
-            random_string = "".join(_r.choices(STRING_APLHA, k=4))
+            random_string = "".join(_r.choices(settings.UNIQUE_STR, k=4))
         current_time = dt.datetime.now()
         milliseconds = current_time.microsecond // 1000 
         microseconds = current_time.microsecond % 1000 
