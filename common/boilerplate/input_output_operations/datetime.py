@@ -114,35 +114,6 @@ class DateTime:
         return formatted_date
 
 
-
-def convert_date_format(input_date_str):
-    # Define a mapping for month names
-    month_names = {
-        "01": "जनवरी",
-        "02": "फरवरी",
-        "03": "मार्च",
-        "04": "अप्रैल",
-        "05": "मई",
-        "06": "जून",
-        "07": "जुलाई",
-        "08": "अगस्त",
-        "09": "सितंबर",
-        "10": "अक्टूबर",
-        "11": "नवंबर",
-        "12": "दिसंबर",
-    }
-
-    # Parse the input date string
-    input_date = datetime.strptime(str(input_date_str), "%Y-%m-%d")
-
-    # Format the date in the desired format
-    output_date = (
-        f"{input_date.day} {month_names[input_date.strftime('%m')]} {input_date.year}"
-    )
-
-    return output_date
-
-
 def convert_image_to_binary(image_file):
     img_buffer = io.BytesIO()
     image_file.save(img_buffer, format="PNG")
